@@ -13,11 +13,11 @@
     "author": "ging",
     "license": "GNU",
     "info": {
-        "githubURL": "ebarra/nosql_practica2",
+        "githubURL": "ebarra/nosql_practica2_sibd",
         "serverUrl": "https://autocorector.dit.upm.es/",
-        "courseId": "7775",
-        "assignmentId": "76893"
-    },
+        "courseId": "8762",
+        "assignmentId": "99544"
+    }
     "repository": {
         "type": "git",
         "url": "https://github.com/ging/autoCOREctor",
