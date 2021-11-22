@@ -1,227 +1,297 @@
 // IMPORTS
 const path = require('path');
-const User = require('../user.json');
+const Utils = require('./testutils');
+const T_TEST = 2 * 60; // Time between tests (seconds)
+const controller = require('../controllers/patient');
+const Patient = require('../models/patient');
+const mongo = require('./test_helper');
+const mongoose = require('mongoose');
 
 // CRITICAL ERRORS
 let error_critical = null;
-let dbname = "data";
-let coleccion = "companies";
-const URL = 'mongodb://localhost:27017/' + dbname;
-let connection;
+let testPatient;
 
-const mongoose = require('mongoose');
-let Admin = mongoose.mongo.Admin;
-const Company = require('./company');
-const Result = require('./result');
+beforeEach( async () => {
+	const data = [
+	   {
+			name: 'Juan',
+			surname: 'Rodriguez',
+			dni: '123123',
+			city: "Madrid",
+			profession: [
+				"Frutero",
+				"Monitor de tiempo libre"
+			],
+			medicalHistory: [
+				{
+					"specialist": "Medico de cabecera",
+					"diagnosis": "Resfriado",
+					"date": new Date( 2017,4,4)
+				},
+				{
+					"specialist": "Dermatólogo",
+					"diagnosis": "Escorbuto",
+					"date": new Date( 2016,11,14)
+				}
+			]
+		},
+		{
+			name: 'Andres',
+			surname: 'Lopez',
+			dni: '222333',
+			city: "Cuenca",
+			profession: [
+				"Futbolista"
+			],
+			medicalHistory: [
+				{
+					"specialist": "Medico de cabecera",
+					"diagnosis": "Resaca",
+					"date": new Date( 2018,11,14)
+				},
+				{
+					"specialist": "Traumatologo",
+					"diagnosis": "Fractura de ligamento cruzado",
+					"date": new Date( 2015,5,14)
+				},
+				{
+					"specialist": "Traumatologo",
+					"diagnosis": "Esguince de tobillo",
+					"date": new Date( 2016,4,24)
+				}
+			]
+		},
+		{
+			name: 'Carlos',
+			surname: 'Lechon',
+			dni: '333444',
+			city: "Madrid",
+			profession: [
+				"Lechero",
+				"Repartidor"
+			],
+			medicalHistory: [
+				{
+					"specialist": "Reumatologo",
+					"diagnosis": "Osteoporosis",
+					"date": new Date( 2016,5,14)
+				},
+				{
+					"specialist": "Medico de cabecera",
+					"diagnosis": "Resfriado",
+					"date": new Date( 2017,1,5)
+				}
+			]
+		},
+		{
+			name: 'Diana',
+			surname: 'Pintor',
+			dni: '555666',
+			city: "Melilla",
+			profession: [
+				"Pintora",
+				"Directora de subastas"
+			],
+			medicalHistory: [
+				{
+					"specialist": "Medico de cabecera",
+					"diagnosis": "Diarrea aguda",
+					"date": new Date( 2016,5,14)
+				},
+				{
+					"specialist": "Traumatologo",
+					"diagnosis": "Síndrome del tunel carpiano",
+					"date": new Date( 2019,3,15)
+				}
+			]
+		},
+		{
+			name: 'Raquel',
+			surname: 'Dueñas',
+			dni: '666777',
+			city: "Barcelona",
+			profession: [
+				"Chef",
+				"Ayudante de cocina",
+				"Camarero"
+			],
+			medicalHistory: [
+				{
+					"specialist": "Cardiologo",
+					"diagnosis": "Arritmia",
+					"date": new Date( 2019,3,26)
+				},
+				{
+					"specialist": "Medico de cabecera",
+					"diagnosis": "Dermatitis",
+					"date": new Date( 2017,1,5)
+				}
+			]
+		},
+		{
+			name: 'Mario Alejandro',
+			surname: 'Arcentales',
+			dni: '777888',
+			city: "Oviedo",
+			profession: [
+				"Minero"
+			],
+			medicalHistory: [
+				{
+					"specialist": "Endocrino",
+					"diagnosis": "Anemia crónica",
+					"date": new Date( 2018,10,26)
+				},
+				{
+					"specialist": "Neumologo",
+					"diagnosis": "Silicosis",
+					"date": new Date( 2019,10,5)
+				}
+			]
+		},
+		{
+			_id: new mongoose.Types.ObjectId('5e4a60fb7be8f229b54a16cb'),
+			name: 'Ana',
+			surname: 'Durcal',
+			dni: '555555',
+			city: "Huelva",
+			profession: [
+				"Frutera",
+				"Monitora de tiempo libre"
+			],
+			medicalHistory: []
+		}
 
-let withDebug = false;
-const debug = (...args) => {
-    if(withDebug){
-      console.log(...args);
-    }
-}
+	];
+	testPatient = {
+		_id: new mongoose.Types.ObjectId('5e3a60fb7be8f029b54a16c9'),
+		name: 'Ana',
+		surname: 'Durcal',
+		dni: '555555',
+		city: "Huelva",
+		profession: [
+			"Frutera",
+			"Monitora de tiempo libre"
+		],
+		medicalHistory: []
+	};
+	test = await Patient.collection.insertMany(data);
+});
 
-let dbexists = false;
+//TESTS
+describe("BBDD Tests", function () {
+	describe('Creating Patient', function() {
+        it('Creating a new Patient', async function() {
+            this.score = 1;
+            this.msg_err = "The patient has not been created correctly"
+            this.msg_ok = "Patient created correctly!"
+            const patient = await controller.create(testPatient)
+            const patientD = await Patient.findOne({ _id: '5e3a60fb7be8f029b54a16c9' });
+            should.equal(!testPatient.isNew, true) ;
+            should.equal(patient.toString(), patientD.toString()) ;
 
-describe("Using Mongo SHELL", function () {
+        });
+    });
+    describe('Get Patients list', function() {
+        it('Getting the list of all available patients', async function() {
+            this.score = 1;
+            this.msg_err = "The patients have not been listed correctly"
+            this.msg_ok = "Patients listed correctly!"
+            const patients = await controller.list();
+            should.equal(patients.length, 7)
+            should.equal(typeof patients[0], 'object');
 
-    before(async function() {
-        console.log("COMPROBACIONES PREVIAS")
-        console.log("Comprobando que la base de datos está arrancada y acepta conexiones...")
-
-        try {
-            await mongoose.connect(URL, {useNewUrlParser: true, useUnifiedTopology: true, socketTimeoutMS: 3000, connectTimeoutMS:3000, serverSelectionTimeoutMS: 2000});
-            //connection = await mongoose.createConnection(URL, {useNewUrlParser: true, useUnifiedTopology: true, socketTimeoutMS: 3000, connectTimeoutMS:3000, serverSelectionTimeoutMS: 2000});
-            //should.exist(connection);
-
-
-            console.log("La base de datos está ok, hemos conseguido conectar!");
-            console.log("\n\n");
-        } catch (err) {
-            console.log("ERR", err);
-            console.log("No se ha podido conectar al servidor de MongoDB, comprueba que ejecutaste el demonio (mongod) y que el puerto está libre y la base de datos quedó a la espera de conexiones.");
-        }
+        })
     });
 
-
-    it('0: Comprobando que existe la base de datos y la colección ...', async function() {
-        this.score = 1;
-        this.msg_ok = `Todo ok, hemos conseguido conectar a la base de datos "${dbname}" y la colección "${coleccion}"  `;
-        this.msg_err = `No se ha podido conectar a la colección pedida. Comprueba que tienes una base de datos de nombre ${dbname} y la colección ${coleccion} .`;
-          return new Promise(function(resolve, reject) {
-            try {
-                new Admin(mongoose.connection.db).listDatabases(function(err, result) {
-                    var allDatabases = result.databases.map((dat)=>dat.name);
-                    debug('listDatabases succeeded', allDatabases);
-                    dbexists = allDatabases.includes(dbname);
-                    dbexists.should.be.equal(true);
-                    mongoose.connection.db.listCollections().toArray(function (err, names) {
-                        if(err) throw err;
-                        let colnames = names.map((dat)=>dat.name);
-                        colnames.includes(coleccion).should.be.equal(true);
-                        debug('listCollections succeeded', colnames);
-                        resolve();
-                    });
-                });
-            } catch (err) {
-              console.log("ERR", err);
-              should.not.exist(err);
-              reject(err);
-            }
-          });
+    describe('Reading Patient details',function() {
+        it('Finding patient with the id 5e4a60fb7be8f229b54a16cb', async function() {
+            this.score = 1;
+            this.msg_err = "The patient with the id 5e4a60fb7be8f229b54a16cb has not been shown correctly";
+            this.msg_ok = "Patient shown correctly!";
+            const patient = await controller.read('5e4a60fb7be8f229b54a16cb');
+            should.equal(patient._id.toString(), '5e4a60fb7be8f229b54a16cb');
+        })
     });
 
-
-    it('1. Actualizar. Comprobando funcionalidad ...', async function() {
-        this.score = 1;
-        this.msg_ok = `La compañía "VistaGen Therapeutics" tiene el email del alumno`;
-        this.msg_err = `La compañía "VistaGen Therapeutics" NO tiene el email del alumno.`;
-        try {
-          let com = await Company.findOne({name: "VistaGen Therapeutics"});
-          debug("COM: ", com.email_address);
-          debug("USER:", User.email);
-          User.email.should.be.equal(com.email_address);
-        } catch(e){
-          debug("ERROR:", e);
-          should.not.exist(e);
-        }
+    describe('Update Patient record', function() {
+        it('Updating Patient with the id 5e4a60fb7be8f229b54a16cb', async function(){
+            this.score = 1;
+            this.msg_err = "The patient with the id 5e4a60fb7be8f229b54a16cb has not been updated correctly"
+            this.msg_ok = "Patient updated correctly!";
+            const patient = await controller.update({ _id: '5e4a60fb7be8f229b54a16cb' },{dni:'777777'});
+            const patientD = await Patient.findOne({ _id: '5e4a60fb7be8f229b54a16cb' });
+            should.equal(patient.dni,patientD.dni);
+        })
     });
 
+    describe('Find Patients by City', function()  {
+        it('Finding Patients with city= Madrid', async function(){
+            this.score = 1;
+            this.msg_err = "The patients with city= Madrid have not been retrieved correctly"
+            this.msg_ok = "Patients retrieved correctly!";
+            const patients= await controller.filterPatientsByCity('Madrid');
+			should.equal(patients.length , 2);
+			should.equal(typeof patients[0], 'object');
+			const patients2 = await controller.filterPatientsByCity('Barcelona');
+			should.equal(patients2.length , 1);
+			should.equal(typeof patients2[0], 'object');
 
-    it('2. Actualizar. Comprobando funcionalidad ...', async function() {
-        this.score = 1;
-        this.msg_ok = `La compañía "VistaGen Therapeutics" tiene el array de partners ok`;
-        this.msg_err = `La compañía "VistaGen Therapeutics" NO tiene el array de partners ok.`;
-        try {
-          let com = await Company.findOne({name: "VistaGen Therapeutics"});
-          debug("COM: ", com.partners);
-          let myarray = com.partners;
-          myarray.length.should.be.equal(1);
-          myarray[0].token.should.be.equal(User.token);
-        } catch(e){
-          debug("ERROR:", e);
-          should.not.exist(e);
-        }
+        })
     });
 
+	describe('Filter Patients by Diagnosis', function() {
+		it('Filtering Patients with Diagnosis= Osteoporosis', async function() {
+            this.score = 1;
+            this.msg_err = "The patients with Diagnosis= Osteoporosis have not been retrieved correctly"
+            this.msg_ok = "Patients with Diagnosis= Osteoporosis have been retrieved correctly!";
+            const patients= await controller.filterPatientsByDiagnosis('Osteoporosis');
+            should.equal(patients.length, 1);
+            should.equal(typeof patients[0], 'object');
+            this.msg_err = "The patients with Diagnosis= Resfriado have not been retrieved correctly"
+            this.msg_ok = "Patients with Diagnosis= Resfriado have been retrieved correctly!";
+            const patients2= await controller.filterPatientsByDiagnosis('Resfriado');
+            should.equal(patients2.length, 2);
+            should.equal(typeof patients2[0], 'object');
+		})
+	});
 
-    it('3. Actualizar multiple. Comprobando funcionalidad ...', async function() {
-        this.score = 1;
-        this.msg_ok = `Las compañías fundadas después de 2012 tienen el campo adicional solicitado`;
-        this.msg_err = `Las compañías fundadas después de 2012 NO tienen el campo adicional solicitado`;
-        try {
-          let com = await Company.find({founded_year: {$gte: 2012}, uptodate: true});
-          debug("COM: ", com);
-          com.length.should.be.equal(43);
-        } catch(e){
-          debug("ERROR:", e);
-          should.not.exist(e);
-        }
-    });
+	describe('Filter Patients by Speacialist And Date', function() {
+		it('Filtering Patients with Speacialist= Medico de cabecera and dates between 2016-04-14 to 2016-07-15', async function() {
+            this.score = 1.5;
+            this.msg_err = "The patients Speacialist= Medico de cabecera and dates between 2016-04-14 to 2016-07-15 have not been retrieved correctly"
+            this.msg_ok = "Patients with Speacialist= Medico de cabecera and dates between 2016-04-14 to 2016-07-15 have been retrieved correctly!";
+            const patients= await controller.filterPatientsBySpeacialistAndDate('Medico de cabecera',new Date(2016, 4, 14),
+				new Date(2016, 7, 15));
+            should.equal(patients.length ,1 );
+            should.equal(typeof patients[0], 'object');
+		})
+	});
 
-    it('4. Borrar un campo. Comprobando funcionalidad ...', async function() {
-        this.score = 1;
-        this.msg_ok = `La compañía "Fixya" ya no tiene el campo "twitter_username"`;
-        this.msg_err = `La compañía "Fixya" aun tiene el campo "twitter_username"`;
-        try {
-          let com = await Company.findOne({name: "Fixya"});
-          debug("COM: ", com);
-          should.not.exist(com.twitter_username);
-        } catch(e){
-          debug("ERROR:", e);
-          should.not.exist(e);
-        }
-    });
+	describe('Add Patient History', function() {
+		it('Adding record to Patient with the id 5e4a60fb7be8f229b54a16cb', async function() {
+            this.score = 1.5;
+            this.msg_err = "The medical record has not been added correctly to the patient with id 5e4a60fb7be8f229b54a16cb"
+            this.msg_ok = "The medical record has been added correctly to the patient with id 5e4a60fb7be8f229b54a16cb!";
+			var record = {"specialist" : "Endocrinologo", "diagnosis" : "Diabetes", "date" : new Date(2019,10,5) };
+            const patient= await controller.addPatientHistory({ _id: '5e4a60fb7be8f229b54a16cb' },record)
+            const patient2= await controller.addPatientHistory({ _id: '5e4a60fb7be8f229b54a16cb' },record)
+            should.equal(patient.medicalHistory[0].specialist, 'Endocrinologo');
+            should.equal(patient.medicalHistory[0].diagnosis,'Diabetes');
+            should.equal(patient2.medicalHistory[1].diagnosis,'Diabetes');
+            should.equal(patient2.medicalHistory[1].specialist, 'Endocrinologo');
+		})
+	});
 
-    it('5. Borrar documento. Comprobando funcionalidad ...', async function() {
-      this.score = 1;
-      this.msg_ok = `La compañía fundada el 21 de abril de 2009 está borrada correctamente`;
-      this.msg_err = `La compañía fundada el 21 de abril de 2009 aún existe`;
-      try {
-        dbexists.should.be.equal(true);
-        let com = await Company.findOne({name: "Hellofam"});
-        debug("COM: ", com);
-        should.not.exist(com);
-      } catch(e){
-        debug("ERROR:", e);
-        should.not.exist(e);
-      }
-    });
-
-    it('6.a) Insertar documento. Comprobando funcionalidad ...', async function() {
-      this.score = 0.5;
-      this.msg_ok = `El documento insertado "Result" existe y tiene el _id correcto`;
-      this.msg_err = `El documento insertado "Result" NO existe o no tiene el _id correcto`;
-      try {
-        let doc = await Result.findOne({_id: User.token});
-        debug("DOC: ", doc);
-        should.exist(doc);
-      } catch(e){
-        debug("ERROR:", e);
-        should.not.exist(e);
-      }
-    });
-
-    it('6.b) Insertar documento. Comprobando funcionalidad ...', async function() {
-      this.score = 0.5;
-      this.msg_ok = `El documento insertado "Result" existe y tiene el email de alumno correcto`;
-      this.msg_err = `El documento insertado "Result" no tiene el _id correcto o no tiene el email de alumno correcto`;
-      try {
-        let doc = await Result.findOne({_id: User.token});
-        debug("DOC: ", doc);
-        doc.email.should.be.equal(User.email);
-      } catch(e){
-        debug("ERROR:", e);
-        should.not.exist(e);
-      }
-    });
-
-    it('6.c) Insertar documento. Comprobando funcionalidad ...', async function() {
-      this.score = 1;
-      this.msg_ok = `El documento insertado "Result" tiene el resultado correcto para compañías con más de 400 empleados`;
-      this.msg_err = `El documento insertado "Result" NO tiene el resultado correcto para compañías con más de 400 empleados`;
-      try {
-        let doc = await Result.findOne({_id: User.token});
-        debug("DOC: ", doc);
-        doc.results.mas_empleados.should.be.equal(3);
-      } catch(e){
-        debug("ERROR:", e);
-        should.not.exist(e);
-      }
-    });
-
-    it('6.d) Insertar documento. Comprobando funcionalidad ...', async function() {
-      this.score = 1;
-      this.msg_ok = `El documento insertado "Result" tiene el resultado correcto para compañías con 3 oficinas`;
-      this.msg_err = `El documento insertado "Result" NO tiene el resultado correcto para compañías con 3 oficinas`;
-      try {
-        let doc = await Result.findOne({_id: User.token});
-        debug("DOC: ", doc);
-        doc.results.tres_oficinas.should.be.equal(10);
-      } catch(e){
-        debug("ERROR:", e);
-        should.not.exist(e);
-      }
-    });
-
-    it('6.e) Insertar documento. Comprobando funcionalidad ...', async function() {
-      this.score = 1;
-      this.msg_ok = `El documento insertado "Result" tiene el resultado correcto para milestones en el año 2011`;
-      this.msg_err = `El documento insertado "Result" NO tiene el resultado correcto para milestones en el año 2011`;
-      try {
-        let doc = await Result.findOne({_id: User.token});
-        debug("DOC: ", doc);
-        doc.results.milestone_2011.should.be.equal(17);
-      } catch(e){
-        debug("ERROR:", e);
-        should.not.exist(e);
-      }
-    });
-
-
-    after(function() {
-        console.log("Cerramos la conexión con la BBDD");
-        mongoose.connection.close();
-    });
+	describe('Remove Patient by ID', function() {
+		it('Removing Patient with the ID 5e4a60fb7be8f229b54a16cb', async function() {
+            this.score = 1;
+            this.msg_err = "The Patient with the ID 5e4a60fb7be8f229b54a16cb has not been removed correctly"
+            this.msg_ok = "The Patient with the ID 5e4a60fb7be8f229b54a16cb has been removed correctly!";
+            const patient= await controller.delete('5e4a60fb7be8f229b54a16cb');
+			const patientD = await Patient.findOne({ _id: '5e4a60fb7be8f229b54a16cb' });
+			should.equal(patientD , null);
+		})
+	});
 
 });

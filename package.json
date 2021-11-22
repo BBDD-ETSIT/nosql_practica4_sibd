@@ -24,6 +24,7 @@
         "directory": "client"
     },
     "dependencies": {
+        "autocorector": "^1.7.1",
         "body-parser": "~1.12.4",
         "ejs": "^3.0.1",
         "express": "~4.13.1",
@@ -32,8 +33,7 @@
         "mongoose": "^6.0.13",
         "mongoose-data-seed": "^2.1.6",
         "nodemon": "^2.0.2",
-        "popper.js": "^1.16.1",
-        "autocorector": "^1.3.0"
+        "popper.js": "^1.16.1"
     },
     "scripts": {
         "start": "node rest_server.js",
