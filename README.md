@@ -54,13 +54,13 @@ Abra un terminal en su ordenador y siga los siguientes pasos.
 El proyecto debe clonarse en el ordenador desde el que se está trabajando con:
 
 ```
-$ git clone https://github.com/BBDD-ETSIT/nosql_practica2_sibd
+$ git clone https://github.com/BBDD-ETSIT/nosql_practica4_sibd
 ```
 
 y entrar en el directorio de trabajo
 
 ```
-$ cd nosql_practica2_sibd
+$ cd nosql_practica4_sibd
 ```
 
 Una vez dentro de la carpeta, se instalan las dependencias con:
