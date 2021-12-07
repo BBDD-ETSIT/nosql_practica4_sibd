@@ -188,8 +188,8 @@ describe("BBDD Tests", function () {
             const patient = await controller.create(testPatient)
             const patientD = await Patient.findOne({ _id: '5e3a60fb7be8f029b54a16c9' });
             should.equal(!testPatient.isNew, true) ;
-            should.equal(patient.toString(), patientD.toString()) ;
-
+            should.equal( patient._id.toString(), patientD._id.toString());
+            should.equal( patient.dni, patientD.dni);
         });
     });
     describe('Get Patients list', function() {
