@@ -1,10 +1,10 @@
 // IMPORTS
 const path = require('path');
-const Utils = require('./testutils');
+const Utils = require('../utils/testutils');
 const T_TEST = 2 * 60; // Time between tests (seconds)
-const controller = require('../controllers/patient');
-const Patient = require('../models/patient');
-const mongo = require('./test_helper');
+const controller = require('../../controllers/patient');
+const Patient = require('../../models/patient');
+const mongo = require('../utils/test_helper');
 const mongoose = require('mongoose');
 
 // CRITICAL ERRORS
@@ -190,6 +190,7 @@ describe("BBDD Tests", function () {
             should.equal(!testPatient.isNew, true) ;
             should.equal( patient._id.toString(), patientD._id.toString());
             should.equal( patient.dni, patientD.dni);
+
         });
     });
     describe('Get Patients list', function() {
