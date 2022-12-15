@@ -259,7 +259,8 @@ En este punto hay que realizar una captura de pantalla (CAPTURA2) donde se muest
 
 ### 5.4 Desplegar la aplicacion y la base de datos con Docker-compose 
 
-Se debe definir un fichero docker compose para desplegar tnato la apliaccion desarrollada en NodeJs como la base de datos de mongoDB de la aplicación final modificada y que ya ha pasado los tests del autocorector.
+Se debe definir un fichero docker compose para desplegar tanto la aplicación desarrollada en NodeJs como la base de datos de mongoDB de la aplicación final modificada que ya ha pasado los tests del autocorector (es de decir la aplicacicón después de haber realizado la tarea 5.3).
+
 Para ello el nombre de los contenedores a desplegar debe seguir la siguiente convencion: **servicio_NOMBREALUMNO** por ejemplo para el contenedor de node para Enrique Barra sería **node_Enrique**
 
 
@@ -287,7 +288,7 @@ $ autocorector --upload
 
 El alumno podrá subir al Moodle la entrega tantas veces como desee pero se quedará registrada solo la última subida.
 
-A pesar de que el autocorector le provee al alumno de una nota, esta es provisional y queda condicionada a la entrega de las capturas y del fichero de despligue en docker-compose. El alumno deberá subir a Moodle las capturas solicitadas y el ficehro docker-compose con las modificaciones realizadas. 
+A pesar de que el autocorector le provee al alumno de una nota, esta es provisional y queda condicionada a la entrega de las capturas y del fichero de despligue en docker-compose. El alumno deberá subir a Moodle las capturas solicitadas y el fichero docker-compose con las modificaciones realizadas. 
 
 **RÚBRICA**: Cada método que se pide resolver de la practica se puntuara de la siguiente manera:
 -  **1 punto por cada uno de las siguientes funciones realizadas:**  list, read, create, update, delete, filterPatientsByCity y filterPatientsByDiagnosis
