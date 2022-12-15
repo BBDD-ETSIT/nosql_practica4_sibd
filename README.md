@@ -87,6 +87,8 @@ Abra un navegador y vaya a la url "http://localhost:8001" para ver la aplicació
 
 ## 5. Tareas a realizar
 
+### 5.1 Implementar las funciones para operar en la Base de Datos
+
 El alumno deberá editar el fichero patient.js ubicado en la carpeta controllers. Se le provee un esqueleto con todos los funciones que deberá rellenar. En cada uno de estas funciones se deberá hacer uso del ODM Mongoose para realizar operaciones con la base de datos y devolver un resultado de la operación.
 
 **NOTA: recuerde que las peticiones a las bases de datos son asíncronas por ello los métodos que ejecutan deben ser asincronos (como puede observar en la cabecera de los mismos) y por tanto las operaciones con Mongoose deben ir precedidas del termino await. Por ejemplo, "var restaurantes = await Restaurante.find()" guardaría en la variable "restaurantes" el resultado de ejecutar la operación "find()"" del modelo Restaurante definido con Mongoose**
@@ -215,6 +217,52 @@ Las funciones hacen lo siguiente:
 
 - El objeto paciente con los datos actualizados incluido la nueva consulta
 
+### 5.2 Conectar a la base de datos adecuada y añadir en el seed un nuevo paciente
+ Primero hay que conseguir conectar a la base de datos, deberá definir la URI de Conexión a la base de datos con nombre **hospitales_NOMBREALUMNO** por ejemplo para Enrique Barra la base de datos se llamaría **hospitales_Enrique**. Este cambio se debe realizar en dos sitios, los ficheros rest_server.js y md-seed-config.js en las siguientes líneas respectivamente.
+
+```
+await mongoose.connect('### Definir la URI de la BBDD',{ useNewUrlParser: true, useUnifiedTopology: true })
+```
+
+```
+const mongoURL = process.env.MONGO_URL || '### Definir la URI de la BBDD';
+```
+En este punto podremos comprobar que la aplicación funciona con 
+```
+$ npm run seed
+```
+
+```
+$ npm start
+```
+Al hacer esto veremos que nos llena la base de datos con los seed (semilla), que son los datos iniciales de la aplicación. 
+Una vez hecho esto tendremos que entrar con mongosh y borrar la base de datos **hospitales_NOMBREALUMNO**, para que así podamos hacer el siguiente paso, que es añadir datos al seed y que al arrancar la aplicación los cree porque detectará que no existe la base de datos.
+
+En este momento tendremos que editar el fichero `seeders/patients.seeders.js` y añadir un nuevo paciente con nuestros datos, nos inventamos el id y la especialidad. 
+
+Una vez hecho esto al volver a arrancar la aplicación con "npm start" cargará este nuevo paciente en la base de datos con el seeder.
+En este momento accedemos a la base de datos con mongosh y hacemos una query para buscar este nuevo paciente. Y hacemos una captura de pantalla (CAPTURA1) donde se vean sus datos en la mongo shell.
+
+
+### 5.3 Añadir un campo nuevo al modelo paciente 
+
+En este momento queremos añadir un campo tipo booleano al modelo paciente, el campo se llama `premium` y tiene que ser `Boolean`.
+
+- Edite `models/patients.js` para añadir este campo.
+
+- Compruebe el contenido de `views/show.ejs` y vea que sobre la línea 107 hay una condición que si el paciente tiene el campo premium a true muestra dicha información.
+
+- Edite el método `read` del paciente que se encuentra en el fichero `controllers/patient.js` para que cuando el paciente  sea el nuevo que añadimos en el seed ponga el campo premium a true (y por lo tanto al visualizar el paciente saldrá la fila adecuada). 
+
+
+En este punto hay que realizar una captura de pantalla (CAPTURA2) donde se muestre que se ha añadido el paciente nuevo inventado por usted con el campo premium a true.
+
+### 5.4 Desplegar la aplicacion y la base de datos con Docker-compose 
+
+Se debe definir un fichero docker compose para desplegar tnato la apliaccion desarrollada en NodeJs como la base de datos de mongoDB de la aplicación final modificada y que ya ha pasado los tests del autocorector.
+Para ello el nombre de los contenedores a desplegar debe seguir la siguiente convencion: **servicio_NOMBREALUMNO** por ejemplo para el contenedor de node para Enrique Barra sería **node_Enrique**
+
+
 
 ## 6. Prueba de la práctica 
 
@@ -238,6 +286,8 @@ $ autocorector --upload
 ```
 
 El alumno podrá subir al Moodle la entrega tantas veces como desee pero se quedará registrada solo la última subida.
+
+A pesar de que el autocorector le provee al alumno de una nota, esta es provisional y queda condicionada a la entrega de las capturas y del fichero de despligue en docker-compose. El alumno deberá subir a Moodle las capturas solicitadas y el ficehro docker-compose con las modificaciones realizadas. 
 
 **RÚBRICA**: Cada método que se pide resolver de la practica se puntuara de la siguiente manera:
 -  **1 punto por cada uno de las siguientes funciones realizadas:**  list, read, create, update, delete, filterPatientsByCity y filterPatientsByDiagnosis
