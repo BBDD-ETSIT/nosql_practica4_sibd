@@ -81,7 +81,7 @@ Por último podemos arrancar la práctica con:
 $ npm start
 ```
 
-Abra un navegador y vaya a la url "http://localhost:8001" para ver la aplicación de gestión de pacientes.
+Abra un navegador y vaya a la url "http://127.0.0.1:8001" para ver la aplicación de gestión de pacientes. (importante ver que el navegador no autorellena https porque si se intenta acceder por https el server no responderá al no estar configurado con certificados, Chrome muchas veces autorellena esa s en httpS).
 
 **NOTA: Cada vez que se quiera realizar una prueba del código desarrollado, debemos parar y arrancar de nuevo la practica. Para ello, desde el terminal pulse ctrl+c para parar y arranque de nuevo con npm start**
 
@@ -232,9 +232,6 @@ En este punto podremos comprobar que la aplicación funciona con
 $ npm run seed
 ```
 
-```
-$ npm start
-```
 Al hacer esto veremos que nos llena la base de datos con los seed (semilla), que son los datos iniciales de la aplicación. 
 Una vez hecho esto tendremos que entrar con mongosh y borrar la base de datos **hospitales_NOMBREALUMNO**, para que así podamos hacer el siguiente paso, que es añadir datos al seed y que al arrancar la aplicación los cree porque detectará que no existe la base de datos.
 
@@ -242,6 +239,12 @@ En este momento tendremos que editar el fichero `seeders/patients.seeders.js` y 
 
 Una vez hecho esto al volver a arrancar la aplicación con "npm start" cargará este nuevo paciente en la base de datos con el seeder.
 En este momento accedemos a la base de datos con mongosh y hacemos una query para buscar este nuevo paciente. Y hacemos una captura de pantalla (CAPTURA1) donde se vean sus datos en la mongo shell.
+
+Ya podremos hacer
+```
+$ npm start
+```
+Para arrancer el servidor incluyendo los datos de este nuevo paciente y acceder a http://127.0.0.1:8001 para ver la aplicación funcionando.
 
 
 ### 5.3 Añadir un campo nuevo al modelo paciente 
@@ -263,18 +266,19 @@ Se debe definir un fichero docker compose para desplegar tanto la aplicación de
 
 Para ello el nombre de los contenedores a desplegar debe seguir la siguiente convencion: **servicio_NOMBREALUMNO** por ejemplo para el contenedor de node para Enrique Barra sería **node_Enrique**
 
+El fichero docker_compose se tiene que poner en la raiz del proyecto. Es decir que se encuentre junto al package.json y rest_server.js, asi el autocorector lo subirá a Moodle y podrá ser evaluado.
 
 
 ## 6. Prueba de la práctica 
 
 Para ayudar al desarrollo, se provee una herramienta de autocorrección que prueba las distintas funcionalidades que se piden en el enunciado.
 
-La herramienta de autocorrección preguntará por el correo del alumno y el token de Moodle. En el enlace [https://www.npmjs.com/package/autocorector](https://www.npmjs.com/package/autocorector) se proveen instrucciones para encontrar dicho token.
+La herramienta de autocorrección preguntará por el correo del alumno y el token de Moodle. En el Moodle de la asignatura hay una presentación con los pasos para instalar y usar el autocorector.
 
-Para instalar y hacer uso de la [herramienta de autocorrección](https://www.npmjs.com/package/autocorector) en el ordenador local, ejecuta los siguientes comandos en el directorio del proyecto:
+Para hacer uso de la [herramienta de autocorrección](https://www.npmjs.com/package/autocorector) en el ordenador local, ejecuta los siguientes comandos en el directorio del proyecto:
 
 ```
-$ autocorector
+$ npx autocorector
 ```
 
 Se puede pasar la herramienta autocorector tantas veces como se desee sin ninguna repercusión en la calificación.
@@ -282,13 +286,12 @@ Se puede pasar la herramienta autocorector tantas veces como se desee sin ningun
 ## 7. Instrucciones para la Entrega y Evaluación.
 
 Una vez satisfecho con su calificación, el alumno puede subir su entrega a Moodle con el siguiente comando:
+
 ```
-$ autocorector --upload
+$ npx autocorector --upload
 ```
 
 El alumno podrá subir al Moodle la entrega tantas veces como desee pero se quedará registrada solo la última subida.
-
-A pesar de que el autocorector le provee al alumno de una nota, esta es provisional y queda condicionada a la entrega de las capturas y del fichero de despligue en docker-compose. El alumno deberá subir a Moodle las capturas solicitadas y el fichero docker-compose con las modificaciones realizadas. 
 
 **RÚBRICA**: Cada método que se pide resolver de la practica se puntuara de la siguiente manera:
 -  **1 punto por cada uno de las siguientes funciones realizadas:**  list, read, create, update, delete, filterPatientsByCity y filterPatientsByDiagnosis
