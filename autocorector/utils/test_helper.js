@@ -6,9 +6,9 @@ mongoose.Promise = global.Promise;
 before( (done) => {
 	console.log('--------------------------')
 	console.log('--> CONNECTING WITH MONGODB...')
-	mongoose.connect('mongodb://127.0.0.1:27017/bio_test');
+
 	mongoose.connection
-	    .once('open', function() { 
+	    .once('open', function() {
 	    	console.log('  --> CONNECTED!')
 	    	console.log('--------------------------')
 	    	done()
@@ -18,6 +18,7 @@ before( (done) => {
 	        console.log('--------------------------')
 	        done()
 	    });
+	mongoose.connect('mongodb://127.0.0.1:27017/bio_test');
 });
 
 //Called hooks which runs before something.
