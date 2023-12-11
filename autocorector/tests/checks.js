@@ -163,8 +163,8 @@ beforeEach( async () => {
 		}
 
 	];
+
 	testPatient = {
-		_id: new mongoose.Types.ObjectId('5e3a60fb7be8f029b54a16c9'),
 		name: 'Ana',
 		surname: 'Durcal',
 		dni: '555555',
@@ -186,10 +186,14 @@ describe("BBDD Tests", function () {
             this.msg_err = "The patient has not been created correctly"
             this.msg_ok = "Patient created correctly!"
             const patient = await controller.create(testPatient)
-            const patientD = await Patient.findOne({ _id: '5e3a60fb7be8f029b54a16c9' });
+            const patientD = await Patient.findOne({ name: 'Ana', surname: 'Durcal' });
             should.equal(!testPatient.isNew, true) ;
-            should.equal( patient._id.toString(), patientD._id.toString());
             should.equal( patient.dni, patientD.dni);
+			should.equal( patient.name, patientD.name);
+			should.equal( patient.surname, patientD.surname);
+			should.equal( patient.city, patientD.city);
+			should.equal( patient.profession[0], patientD.profession[0]);
+			should.equal( patient.profession[1], patientD.profession[1]);
 
         });
     });
